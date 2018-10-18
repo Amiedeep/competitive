@@ -13,6 +13,22 @@ public class ReverseListWithIndexGroups {
         this.root = reverseWithKGroups(root, groupSize);
     }
 
+    private void reverse() {
+        Node ptr = root;
+        reverse(ptr);
+        ptr.next = null;
+    }
+
+    private Node reverse(Node node) {
+        if(node.next == null) {
+            root = node;
+            return node;
+        }
+        Node nextNode = reverse(node.next);
+        nextNode.next = node;
+        return node;
+    }
+
     private Node reverseWithKGroups(Node node, int groupSize) {
 
         if (node == null)
@@ -51,7 +67,8 @@ public class ReverseListWithIndexGroups {
         ReverseListWithIndexGroups reverseListWithIndexGroups = new ReverseListWithIndexGroups(node1);
 
         reverseListWithIndexGroups.printList();
-        reverseListWithIndexGroups.reverseWithKGroups(4);
+//        reverseListWithIndexGroups.reverseWithKGroups(4);
+        reverseListWithIndexGroups.reverse();
         System.out.println();
         reverseListWithIndexGroups.printList();
     }
@@ -62,6 +79,7 @@ public class ReverseListWithIndexGroups {
             System.out.print(node.data + " ");
             node = node.next;
         }
+//        System.out.print(node + " ");
     }
 }
 
