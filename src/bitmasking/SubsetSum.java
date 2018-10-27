@@ -1,3 +1,5 @@
+package bitmasking;
+
 import java.util.ArrayList;
 import java.util.List;
 
