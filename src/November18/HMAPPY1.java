@@ -8,10 +8,13 @@ public class HMAPPY1 {
     private final int[] inputArray;
     private final int k;
     private int longestSubsequence;
+    private int longestSubsequenceStartIndex;
+    private int rightShifts;
 
     public HMAPPY1(int[] inputArray, int k) {
         this.inputArray = inputArray;
         this.k = k;
+        updateLongestSubSequence();
     }
 
     public static void main(String[] args) {
@@ -32,23 +35,48 @@ public class HMAPPY1 {
             }
             else {
 
-                hmappy1.updateLongestSubSequence();
-                hmappy1.printLongestSubsequence();
+                int longestSubSequence = hmappy1.findLongestSubSequence();
+                System.out.println(longestSubSequence);
+//                hmappy1.updateLongestSubSequence();
+//                hmappy1.printLongestSubsequence();
             }
         }
     }
 
-    private void printLongestSubsequence() {
-        System.out.println(this.longestSubsequence);
+    private int findLongestSubSequence() {
+
+        int longestSequence = Math.min(inputArray.length - longestSubsequenceStartIndex - rightShifts, longestSubsequence);
+
+        int temp = 0;
+        int maxInStartOfArray = 0;
+        for (int i = inputArray.length - rightShifts; i < inputArray.length && temp <k; i++) {
+            if(inputArray[i] == 1) {
+                temp = temp + 1;
+                if (temp > maxInStartOfArray) {
+                    maxInStartOfArray = temp;
+                }
+            }
+            else
+                temp = 0;
+        }
+
+        for (int i = 0; i < inputArray.length && temp <k; i++) {
+            if(inputArray[i] == 1) {
+                temp = temp + 1;
+                if (temp > maxInStartOfArray) {
+                    maxInStartOfArray = temp;
+                }
+            }
+            else
+                break;
+        }
+
+        return Math.max(maxInStartOfArray, longestSequence);
     }
 
+
     private void rightShiftArray() {
-        int inputArrayLength = inputArray.length;
-        int temp = inputArray[inputArrayLength -1];
-
-        System.arraycopy(inputArray, 0, inputArray, 1, inputArrayLength - 1);
-
-        inputArray[0] = temp;
+        this.rightShifts = (this.rightShifts + 1)%inputArray.length;
     }
 
     private void updateLongestSubSequence() {
@@ -59,6 +87,7 @@ public class HMAPPY1 {
             if(inputArray[i] == 1) {
                 longestSequenceIncludingElement = longestSequenceIncludingElement + 1;
                 if(longestSequenceIncludingElement > this.longestSubsequence) {
+                    this.longestSubsequenceStartIndex = i - longestSequenceIncludingElement + 1;
                     this.longestSubsequence = longestSequenceIncludingElement;
                 }
             }
