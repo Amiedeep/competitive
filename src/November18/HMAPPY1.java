@@ -1,20 +1,34 @@
 package November18;
 
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Objects.isNull;
 
 public class HMAPPY1 {
 
     private final int[] inputArray;
     private final int k;
     private int longestSubsequence;
-    private int longestSubsequenceStartIndex;
     private int rightShifts;
+    private int maxSubsequenceFromStart;
+    private Map<Integer, List<Integer>> indexMaxValueMap;
 
     public HMAPPY1(int[] inputArray, int k) {
         this.inputArray = inputArray;
         this.k = k;
+        indexMaxValueMap = new HashMap<>();
         updateLongestSubSequence();
+        updateMaxSubsequenceFromStart();
+    }
+
+    private void updateMaxSubsequenceFromStart() {
+        for (int i = 0; i < inputArray.length; i++) {
+            if (inputArray[i] == 1)
+                maxSubsequenceFromStart++;
+            else
+                break;
+        }
     }
 
     public static void main(String[] args) {
@@ -34,21 +48,18 @@ public class HMAPPY1 {
                 hmappy1.rightShiftArray();
             }
             else {
-
                 int longestSubSequence = hmappy1.findLongestSubSequence();
                 System.out.println(longestSubSequence);
-//                hmappy1.updateLongestSubSequence();
-//                hmappy1.printLongestSubsequence();
             }
         }
     }
 
     private int findLongestSubSequence() {
+        int maxInStartOfArray = 0;
 
-        int longestSequence = Math.min(inputArray.length - longestSubsequenceStartIndex - rightShifts, longestSubsequence);
+        int inputArrayLength = inputArray.length;
 
         int temp = 0;
-        int maxInStartOfArray = 0;
         for (int i = inputArray.length - rightShifts; i < inputArray.length && temp <k; i++) {
             if(inputArray[i] == 1) {
                 temp = temp + 1;
@@ -60,18 +71,19 @@ public class HMAPPY1 {
                 temp = 0;
         }
 
-        for (int i = 0; i < inputArray.length && temp <k; i++) {
-            if(inputArray[i] == 1) {
-                temp = temp + 1;
-                if (temp > maxInStartOfArray) {
-                    maxInStartOfArray = temp;
-                }
-            }
-            else
-                break;
-        }
+        if(temp != 0)
+            temp += maxSubsequenceFromStart;
+        maxInStartOfArray = Math.max(temp, maxInStartOfArray);
 
-        return Math.max(maxInStartOfArray, longestSequence);
+        int longestSequence = maxInStartOfArray;
+
+        for (int i = longestSubsequence; i > longestSequence ; i--) {
+            List<Integer> indexes = indexMaxValueMap.get(i);
+            if(indexes.stream().anyMatch(index -> (index + rightShifts) < inputArrayLength)) {
+                longestSequence = i;
+            }
+        }
+        return Math.min(longestSequence, k);
     }
 
 
@@ -86,10 +98,12 @@ public class HMAPPY1 {
 
             if(inputArray[i] == 1) {
                 longestSequenceIncludingElement = longestSequenceIncludingElement + 1;
-                if(longestSequenceIncludingElement > this.longestSubsequence) {
-                    this.longestSubsequenceStartIndex = i - longestSequenceIncludingElement + 1;
+                if (isNull(indexMaxValueMap.get(longestSequenceIncludingElement)))
+                    indexMaxValueMap.put(longestSequenceIncludingElement, new ArrayList<>(Arrays.asList(i)));
+                else
+                    indexMaxValueMap.get(longestSequenceIncludingElement).add(i);
+                if(longestSequenceIncludingElement > this.longestSubsequence)
                     this.longestSubsequence = longestSequenceIncludingElement;
-                }
             }
             else
                 longestSequenceIncludingElement = 0;
